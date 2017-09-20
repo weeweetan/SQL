@@ -1,0 +1,31 @@
+drop table if exists foo;
+create table foo
+(
+id int unsigned not null auto_increment primary key,
+val smallint unsigned not null default 0
+)
+engine=innodb;
+
+drop procedure if exists load_foo_test_data;
+
+delimiter #
+create procedure load_foo_test_data()
+begin
+
+declare v_max int unsigned default 100000;
+declare v_counter int unsigned default 0;
+
+  truncate table foo;
+  start transaction;
+  while v_counter < v_max do
+    insert into foo (val) values ( floor(0 + (rand() * 65535)) );
+    set v_counter=v_counter+1;
+  end while;
+  commit;
+end #
+
+delimiter ;
+
+call load_foo_test_data();
+
+原文参考：https://stackoverflow.com/questions/5125096/for-loop-example-in-mysql，感谢原作者
